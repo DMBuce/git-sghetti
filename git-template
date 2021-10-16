@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# setup
+USAGE='[args]'
+LONG_USAGE='Do a thing.'
+SUBDIRECTORY_OK=Yes
+NONGIT_OK=Yes
+. "$(git --exec-path)/git-sh-setup"
+# sourcing git-sh-setup defines:
+#GIT_DIR -- absolute path to git root
+#GIT_OBJECT_DIRECTORY -- e.g. .git/objects
+
+## do the thing
+#cd_to_toplevel
+#do_thing "$@"
+

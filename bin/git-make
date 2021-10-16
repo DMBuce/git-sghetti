@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# setup
+USAGE='[args]'
+LONG_USAGE='run `make <args>` from the root of the repository.'
+SUBDIRECTORY_OK=Yes
+. "$(git --exec-path)/git-sh-setup"
+
+# run make from git root
+cd_to_toplevel
+exec make "$@"
+

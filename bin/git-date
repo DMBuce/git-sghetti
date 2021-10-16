@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# setup
+USAGE='<args>'
+LONG_USAGE='use the output of `date <args>` to change the timestamp on the last commit.'
+SUBDIRECTORY_OK=Yes
+. "$(git --exec-path)/git-sh-setup"
+
+# parse args
+if (( $# == 0 )); then
+	usage
+fi
+
+# change timestamp of last commit
+date="$(date "$@")" || exit
+GIT_COMMITTER_DATE="$date" git commit --amend --date "$date" --no-edit
+
