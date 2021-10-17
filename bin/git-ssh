@@ -22,9 +22,6 @@ while (( $# )); do
 			shift
 			break
 		;;
-		-*)
-			die "Unimplemented option (this is a bug): $1"
-		;;
 		*)
 			break
 		;;
