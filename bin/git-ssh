@@ -10,24 +10,10 @@ LONG_USAGE='SSH into the remote repository of the current branch and run \`<comm
 # set up shell functions, define $GIT_DIR, $GIT_OBJECT_DIRECTORY
 . "$(git --exec-path)/git-sh-setup"
 
-# print help output if called with no args
-if [[ -z "$*" || "$*" == '--' ]]; then
-	usage
+# check args
+if [[ -z "$*" || "$*" == *--help* ]]; then
+	die "$LONG_USAGE"
 fi
-
-# parse options
-while (( $# )); do
-	case "$1" in
-		--)
-			shift
-			break
-		;;
-		*)
-			break
-		;;
-	esac
-	shift
-done
 
 # parse args
 cmd="$*"
@@ -46,8 +32,7 @@ if [[ -n "$user" ]]; then
 	target="$user@$host"
 fi
 
-# ssh into [user@]host, create repo dir if necessary,
-# switch to repo, and run command
+# run command from remote repo
 set -x
 ssh "$target" "mkdir -p $dir && cd $dir || exit; $cmd"
 
