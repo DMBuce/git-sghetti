@@ -119,9 +119,11 @@ OPTIONS_SPEC="\
 ${prog/-/ } [url [...]]
 
 Print the properties (scheme, flavor, proto, user, host, and dir) of each url.
-If no <url>s are provided, the remote repository of the current branch is used.
-If this script is sourced, define the properties as shell variables instead of
-printing them.
+If no <url>s are provided, the upstream remote of the current branch is used.
+If the current branch has no remote configured, 'origin' is used instead.
+
+If this script is sourced, define the url properties as shell variables instead
+of printing them.
 --
 "
 
