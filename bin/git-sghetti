@@ -1,0 +1,153 @@
+#!/bin/bash
+
+# define some vars
+prog="${0##*/}"
+SUBDIRECTORY_OK=Yes
+NONGIT_OK=Yes
+USAGE='[url [...]]'
+LONG_USAGE="\
+Take each git url and print the scheme, flavor, proto, user, host, and dir.
+If no <url>s are provided, the remote repository of the current branch is used."
+#OPTS_SPEC="\
+#$prog $USAGE
+#
+#$LONG_USAGE
+#--
+# Options
+#a,all!        If no <url> is provided, print all remotes.
+#h,help!       Show this help message and exit.
+#"
+#
+## normalize opts and args
+#eval "$(echo "$OPTS_SPEC" | git rev-parse --parseopt --keep-dashdash -- "$@" || echo exit $?)"
+
+# set up some useful shell functions, $GIT_DIR, and $GIT_OBJECT_DIRECTORY 
+. "$(git --exec-path)/git-sh-setup"
+
+## parse options
+#all=0
+#while (( $# )); do
+#	case "$1" in
+#		-a|--all)
+#			all=1
+#		;;
+#		--)
+#			shift
+#			break
+#		;;
+#		-*)
+#			die "unimplemented option (this is a bug): $1"
+#			#usage
+#		;;
+#		*)
+#			break
+#		;;
+#	esac
+#	shift
+#done
+
+# set default url
+if (( ! $# )); then
+	# figure out remote url for current branch
+	branch="$(git rev-parse --abbrev-ref HEAD)"
+	remote="$(git config --default origin "branch.$branch.remote")"
+	url="$(git config "remote.$remote.url")"
+
+	# check if remote has a url
+	if [[ -z "$remote" ]]; then
+		die "No remote configured for branch: $branch"
+	elif [[ -z "$url" ]]; then
+		die "No url configured for remote: $remote"
+	fi
+fi
+
+# process each url
+i=0
+for url in "$@"; do
+	scheme=
+	flavor=
+	proto=
+	user=
+	host=
+	dir=
+	# figure out type, proto, user, host[:port], dir from url
+	if [[ $url == /* ]]; then
+		# /path/to/repo.git/
+		scheme=path
+		dir="$url"
+		flavor=file
+	elif [[ $url == file://* ]]; then
+		# file:///path/to/repo.git/
+		scheme=uri
+		proto="${url%%://*}"
+		dir="${url#*://}"
+		flavor="$proto"
+	elif [[ $url =~ ([a-z]+)://([^@/]+@)?([^/~]+)([/~].*) ]]; then
+		# git://host.xz[:port]/path/to/repo.git/
+		# git://host.xz[:port]/~[user]/path/to/repo.git/
+		# http[s]://host.xz[:port]/path/to/repo.git/
+		# ftp[s]://host.xz[:port]/path/to/repo.git/
+		# ssh://[user@]host.xz[:port]/path/to/repo.git/
+		# ssh://[user@]host.xz[:port]/~[user]/path/to/repo.git/
+		scheme=uri
+		proto="${BASH_REMATCH[1]}"
+		user="${BASH_REMATCH[2]}"; user="${user%@}"
+		host="${BASH_REMATCH[3]}"
+		dir="${BASH_REMATCH[4]}"
+		flavor="${proto%s}"
+	elif [[ $url =~ ([^@/]+@)?([^:]+):(.*) ]]; then
+		# [user@]host.xz:path/to/repo.git/
+		# [user@]host.xz:/~[user]/path/to/repo.git/
+		scheme=scp
+		user="${BASH_REMATCH[1]}"; user="${user%@}"
+		host="${BASH_REMATCH[2]}"
+		dir="${BASH_REMATCH[3]}"
+		flavor=ssh
+	else
+		echo "Warning: Couldn't parse url: $url" >&2
+	fi
+
+	# use config to override flavor, user
+	while IFS=' ' read -r sghetti rule var condition val; do
+		if [[ $condition == equals && ${!var} == $val ]]; then
+			# set var to val
+			while IFS=' ' read -r setvar value; do
+				declare "$setvar=$value"
+			done < <( \
+				git config --get-regexp "^sghetti\.$rule\.set-(flavor|user)$" \
+				| sed "s/^sghetti\.$rule\.set-//"
+			)
+			break
+		elif [[ $condition == matches && ${!var} =~ $val ]]; then
+			while IFS=' ' read -r setvar value; do
+				# substitue \1, \2, \3, etc.
+				for i in {1..9}; do
+					value="${value//\\$i/${BASH_REMATCH[$i]}}"
+				done
+				# set var to val
+				declare "$setvar=$value"
+			done < <( \
+				git config --get-regexp "^sghetti\.$rule\.set-(flavor|user)$" \
+				| sed "s/^sghetti\.$rule\.set-//"
+			)
+			break
+		fi
+	done < <( \
+		var_re="(url|scheme|flavor|proto|user|host|dir)"
+		git config --get-regexp "^sghetti\.rule[0-9]{3}\.$var_re-(matches|equals)$" \
+		| sed 's/\./ /; s/\./ /; s/-/ /' \
+		| LC_ALL=C sort
+	)
+
+	# print each variable
+	((i++)) && echo
+	printf "%s\n" \
+		"${url@A}" \
+		"${scheme@A}" \
+		"${flavor@A}" \
+		"${proto@A}" \
+		"${user@A}" \
+		"${host@A}" \
+		"${dir@A}"
+done
+
