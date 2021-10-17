@@ -1,16 +1,75 @@
 #!/bin/bash
 
-# setup
-USAGE='[args]'
-LONG_USAGE='Do a thing.'
+# define some vars
+prog="${0##*/}"
 SUBDIRECTORY_OK=Yes
 NONGIT_OK=Yes
-. "$(git --exec-path)/git-sh-setup"
-# sourcing git-sh-setup defines:
-#GIT_DIR -- absolute path to git root
-#GIT_OBJECT_DIRECTORY -- e.g. .git/objects
+USAGE='[-f|--foo] [-b|--bar <arg>] [--baz <baz-arg>] <args>'
+LONG_USAGE='Do something with <args>.'
+OPTS_SPEC="\
+$prog $USAGE
 
-## do the thing
+$LONG_USAGE
+--
+ option group header (use --no-OPTION to disable --OPTION)
+f,foo         some nifty option --foo
+b,bar=arg     some cool option --bar with an argument named arg1
+
+ another option group header
+q,qux!        an option without --no-qux counterpart
+baz!=baz-arg  another cool option --baz with a named argument
+ 
+h,help!       show this help message and exit
+"
+
+# print help output when called with no args
+(( $# )) || set -- -h
+
+# normalize options
+eval "$(echo "$OPTS_SPEC" | git rev-parse --parseopt --keep-dashdash -- "$@" || echo exit $?)"
+
+# set up some useful shell functions, $GIT_DIR, and $GIT_OBJECT_DIRECTORY 
+. "$(git --exec-path)/git-sh-setup"
+
+# parse options
+foo=0
+echo "$@"
+while (( $# )); do
+	case "$1" in
+		-f|--foo)
+			foo=1
+		;;
+		--no-foo)
+			foo=0
+		;;
+		-b|--bar)
+			shift
+			bar="$1"
+		;;
+		--no-bar)
+			unset bar
+		;;
+		--baz)
+			shift
+			baz="$1"
+		;;
+		--)
+			shift
+			break
+		;;
+		-*)
+			die "unimplemented option (this is a bug): $1"
+			#usage
+		;;
+		*)
+			break
+		;;
+	esac
+	shift
+done
+
+# do something with remaining args
 #cd_to_toplevel
+echo "$PWD> $prog $*"
 #do_thing "$@"
 
