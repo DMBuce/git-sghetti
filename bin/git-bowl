@@ -1,0 +1,13 @@
+#!/bin/bash
+
+depth="$(git config rim.depth)"
+depth="${depth:-2}"
+
+while read dir; do
+	[[ "$dir" == */.git ]] && dir="${dir%/.git}"
+	cd "$dir"
+	echo "> $dir"
+	"$@" #2>&1 | sed "s/^/$dir:\t/"
+	cd - >/dev/null
+done < <(find * -maxdepth "$depth" -name \*.git)
+
