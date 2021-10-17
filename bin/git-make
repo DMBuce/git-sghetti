@@ -1,9 +1,13 @@
 #!/bin/bash
 
-# setup
-USAGE='[args]'
-LONG_USAGE='run `make <args>` from the root of the repository.'
+# define some vars
+prog="${0##*/}"
 SUBDIRECTORY_OK=Yes
+NONGIT_OK=
+USAGE='[args]'
+LONG_USAGE='Run `make <args>` from the root of the repository.'
+
+# set up shell functions, define $GIT_DIR, $GIT_OBJECT_DIRECTORY
 . "$(git --exec-path)/git-sh-setup"
 
 # run make from git root
