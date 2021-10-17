@@ -1,50 +1,63 @@
 #!/bin/bash
 
-# setup
-USAGE='[-m|--mkdirs] <command>'
-LONG_USAGE="ssh into the remote repository of the current branch and run \`<command>\`."
+# define some vars
+prog="${0##*/}"
 SUBDIRECTORY_OK=Yes
+NONGIT_OK=Yes
+OPTIONS_KEEPDASHDASH=
+OPTIONS_STUCKLONG=
+OPTIONS_SPEC="\
+${prog/-/ } <command>
+
+SSH into the remote repository of the current branch and run \`<command>\`.
+--
+ Options
+h,help!    Show this help message and exit.
+"
+
+# normalize options, set up shell functions, define $GIT_DIR, $GIT_OBJECT_DIRECTORY
 . "$(git --exec-path)/git-sh-setup"
 
-# parse args
-mkdirs=0
-if [[ "$1" =~ ^(-m|--mkdirs?)$ ]]; then
-	mkdirs=1
-	shift
+# print help output if called with no args
+if [[ -z "$*" || "$*" == '--' ]]; then
+	usage
 fi
+
+# parse options
+while (( $# )); do
+	case "$1" in
+		--)
+			shift
+			break
+		;;
+		-*)
+			die "Unimplemented option (this is a bug): $1"
+		;;
+		*)
+			break
+		;;
+	esac
+	shift
+done
+
+# parse args
 cmd="$*"
 
-# figure out remote url for current branch
-branch="$(git rev-parse --abbrev-ref HEAD)"
-remote="$(git config --default origin "branch.$branch.remote")"
-url="$(git config "remote.$remote.url")"
+# parse remote url
+. <(git-sghetti)
 
-# check if remote has a url
-if [[ -z "$remote" ]]; then
-	die "No remote configured for branch: $branch"
-elif [[ -z "$url" ]]; then
-	die "No url configured for remote: $remote"
+# make sure we have an ssh url
+if [[ "$flavor" != ssh ]]; then
+	die "Not an ssh url: $url"
 fi
 
-# figure out ssh target and directory from url
-if [[ $url == ssh:// ]]; then
-	# ssh://[user@]host.xz[:port]/path/to/repo.git/
-	# ssh://[user@]host.xz[:port]/~[user]/path/to/repo.git/
-	url="${url#ssh://}"
-	IFS=/ read target dir <<< "$url"
-	[[ $dir != ~* ]] && dir="/$dir"
-	target="ssh://$target"
-elif [[ $url != *://* && $url != /* ]]; then
-	# [user@]host.xz:path/to/repo.git/
-	# [user@]host.xz:/~[user]/path/to/repo.git/
-	IFS=: read target dir <<< "$url"
-	[[ $dir != /~* ]] && dir="${dir#/}"
-else
-	die "Remote '$remote' does not have an SSH URL: $url"
+# determine ssh target
+target="$host"
+if [[ -n "$user" ]]; then
+	target="$user@$host"
 fi
 
-# ssh into target [user@]host, switch to repo, and run command
-setup="cd $dir || exit"
-(( mkdirs )) && setup="mkdir -p $dir && $setup"
-ssh "$target" "$setup; $cmd"
+# ssh into [user@]host, create repo dir if necessary,
+# switch to repo, and run command
+ssh "$target" "mkdir -p $dir && cd $dir || exit; $cmd"
 
