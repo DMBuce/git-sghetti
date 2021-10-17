@@ -26,10 +26,15 @@ if [[ -z "$*" || "$*" == '--' ]]; then
 
 	# check if remote has a url
 	if [[ -z "$remote" ]]; then
+		echo exit 1
 		die "No remote configured for branch: $branch"
 	elif [[ -z "$url" ]]; then
+		echo exit 1
 		die "No url configured for remote: $remote"
 	fi
+
+	# set url
+	set -- "$url"
 fi
 
 # parse options
@@ -40,6 +45,7 @@ while (( $# )); do
 			break
 		;;
 		-*)
+			echo exit 1
 			die "Unimplemented option (this is a bug): $1"
 		;;
 		*)
@@ -92,7 +98,8 @@ for url in "$@"; do
 		dir="${BASH_REMATCH[3]}"
 		flavor=ssh
 	else
-		echo "Warning: Couldn't parse url: $url" >&2
+		echo exit 1
+		die "Couldn't parse url: $url"
 	fi
 
 	# use config to override flavor, user
