@@ -14,11 +14,11 @@ If no <url>s are provided, the remote repository of the current branch is used.
 --
 "
 
-# parse options and create useful shell functions, $GIT_DIR, $GIT_OBJECT_DIRECTORY 
+# normalize options, set up shell functions, define $GIT_DIR, $GIT_OBJECT_DIRECTORY
 . "$(git --exec-path)/git-sh-setup"
 
 # use remote url if called with no args
-if (( ! $# )); then
+if [[ -z "$*" || "$*" == '--' ]]; then
 	# figure out remote url for current branch
 	branch="$(git rev-parse --abbrev-ref HEAD)"
 	remote="$(git config --default origin "branch.$branch.remote")"
@@ -31,6 +31,23 @@ if (( ! $# )); then
 		die "No url configured for remote: $remote"
 	fi
 fi
+
+# parse options
+while (( $# )); do
+	case "$1" in
+		--)
+			shift
+			break
+		;;
+		-*)
+			die "Unimplemented option (this is a bug): $1"
+		;;
+		*)
+			break
+		;;
+	esac
+	shift
+done
 
 # process each url
 i=0

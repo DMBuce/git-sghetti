@@ -22,17 +22,16 @@ baz!=baz-arg  another cool option --baz with a named argument
 h,help!       show this help message and exit
 "
 
-# parse options and create useful shell functions, $GIT_DIR, $GIT_OBJECT_DIRECTORY 
+# normalize options, set up shell functions, define $GIT_DIR, $GIT_OBJECT_DIRECTORY
 . "$(git --exec-path)/git-sh-setup"
 
 # print help output if called with no args
-if (( ! $# )); then
+if [[ -z "$*" || "$*" == '--' ]]; then
 	usage
 fi
 
 # parse options
 foo=0
-echo "$@"
 while (( $# )); do
 	case "$1" in
 		-f|--foo)
@@ -57,8 +56,7 @@ while (( $# )); do
 			break
 		;;
 		-*)
-			die "unimplemented option (this is a bug): $1"
-			#usage
+			die "Unimplemented option (this is a bug): $1"
 		;;
 		*)
 			break
