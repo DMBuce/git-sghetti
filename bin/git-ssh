@@ -51,5 +51,6 @@ fi
 
 # ssh into [user@]host, create repo dir if necessary,
 # switch to repo, and run command
+set -x
 ssh "$target" "mkdir -p $dir && cd $dir || exit; $cmd"
 
