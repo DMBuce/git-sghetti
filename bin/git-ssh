@@ -15,6 +15,9 @@ SSH into the remote repository of the current branch and run \`<command>\`.
 h,help!    Show this help message and exit.
 "
 
+# don't process options in command
+set -- -- "$@"
+
 # normalize options, set up shell functions, define $GIT_DIR, $GIT_OBJECT_DIRECTORY
 . "$(git --exec-path)/git-sh-setup"
 
