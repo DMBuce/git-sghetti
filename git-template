@@ -4,32 +4,31 @@
 prog="${0##*/}"
 SUBDIRECTORY_OK=Yes
 NONGIT_OK=Yes
-USAGE='[-f|--foo] [-b|--bar <arg>] [--baz <baz-arg>] <args>'
-LONG_USAGE='Do something with <args>.'
-OPTS_SPEC="\
-$prog $USAGE
+OPTIONS_KEEPDASHDASH=
+OPTIONS_STUCKLONG=
+OPTIONS_SPEC="\
+${prog/-/ } [-f|--foo] [-b|--bar <arg>] [--baz <baz-arg>] <args>
 
-$LONG_USAGE
+Do something with <args>.
 --
- option group header (use --no-OPTION to disable --OPTION)
+ Option group header (use --no-OPTION to disable --OPTION)
 f,foo         some nifty option --foo
 b,bar=arg     some cool option --bar with an argument named arg1
 
- another option group header
+ Another option group header
 q,qux!        an option without --no-qux counterpart
 baz!=baz-arg  another cool option --baz with a named argument
  
 h,help!       show this help message and exit
 "
 
-# print help output when called with no args
-(( $# )) || set -- -h
-
-# normalize options
-eval "$(echo "$OPTS_SPEC" | git rev-parse --parseopt --keep-dashdash -- "$@" || echo exit $?)"
-
-# set up some useful shell functions, $GIT_DIR, and $GIT_OBJECT_DIRECTORY 
+# parse options and create useful shell functions, $GIT_DIR, $GIT_OBJECT_DIRECTORY 
 . "$(git --exec-path)/git-sh-setup"
+
+# print help output if called with no args
+if (( ! $# )); then
+	usage
+fi
 
 # parse options
 foo=0

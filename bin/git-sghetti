@@ -4,49 +4,20 @@
 prog="${0##*/}"
 SUBDIRECTORY_OK=Yes
 NONGIT_OK=Yes
-USAGE='[url [...]]'
-LONG_USAGE="\
-Take each git url and print the scheme, flavor, proto, user, host, and dir.
-If no <url>s are provided, the remote repository of the current branch is used."
-#OPTS_SPEC="\
-#$prog $USAGE
-#
-#$LONG_USAGE
-#--
-# Options
-#a,all!        If no <url> is provided, print all remotes.
-#h,help!       Show this help message and exit.
-#"
-#
-## normalize opts and args
-#eval "$(echo "$OPTS_SPEC" | git rev-parse --parseopt --keep-dashdash -- "$@" || echo exit $?)"
+OPTIONS_KEEPDASHDASH=
+OPTIONS_STUCKLONG=
+OPTIONS_SPEC="\
+${prog/-/ } [url [...]]
 
-# set up some useful shell functions, $GIT_DIR, and $GIT_OBJECT_DIRECTORY 
+Take each git url and print the scheme, flavor, proto, user, host, and dir.
+If no <url>s are provided, the remote repository of the current branch is used.
+--
+"
+
+# parse options and create useful shell functions, $GIT_DIR, $GIT_OBJECT_DIRECTORY 
 . "$(git --exec-path)/git-sh-setup"
 
-## parse options
-#all=0
-#while (( $# )); do
-#	case "$1" in
-#		-a|--all)
-#			all=1
-#		;;
-#		--)
-#			shift
-#			break
-#		;;
-#		-*)
-#			die "unimplemented option (this is a bug): $1"
-#			#usage
-#		;;
-#		*)
-#			break
-#		;;
-#	esac
-#	shift
-#done
-
-# set default url
+# use remote url if called with no args
 if (( ! $# )); then
 	# figure out remote url for current branch
 	branch="$(git rev-parse --abbrev-ref HEAD)"
