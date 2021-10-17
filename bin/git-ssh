@@ -4,21 +4,10 @@
 prog="${0##*/}"
 SUBDIRECTORY_OK=Yes
 NONGIT_OK=
-OPTIONS_KEEPDASHDASH=
-OPTIONS_STUCKLONG=
-OPTIONS_SPEC="\
-${prog/-/ } <command>
+USAGE='<command>'
+LONG_USAGE='SSH into the remote repository of the current branch and run \`<command>\`.'
 
-SSH into the remote repository of the current branch and run \`<command>\`.
---
- Options
-h,help!    Show this help message and exit.
-"
-
-# don't process options in command
-set -- -- "$@"
-
-# normalize options, set up shell functions, define $GIT_DIR, $GIT_OBJECT_DIRECTORY
+# set up shell functions, define $GIT_DIR, $GIT_OBJECT_DIRECTORY
 . "$(git --exec-path)/git-sh-setup"
 
 # print help output if called with no args
