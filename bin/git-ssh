@@ -36,7 +36,7 @@ done
 cmd="$*"
 
 # parse remote url
-. <(git-sghetti)
+. git-sghetti
 
 # make sure we have an ssh url
 if [[ "$flavor" != ssh ]]; then
