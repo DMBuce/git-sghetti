@@ -12,14 +12,14 @@ ${prog/-/ } [-f|--foo] [-b|--bar <arg>] [--baz <baz-arg>] <args>
 Do something with <args>.
 --
  Option group header (use --no-OPTION to disable --OPTION)
-f,foo         some nifty option --foo
-b,bar=arg     some cool option --bar with an argument named arg1
+f,foo         Some nifty option --foo
+b,bar=arg     Some cool option --bar with an argument named arg1
 
  Another option group header
-q,qux!        an option without --no-qux counterpart
-baz!=baz-arg  another cool option --baz with a named argument
+q,qux!        An option without --no-qux counterpart
+baz!=baz-arg  Another cool option --baz with a named argument
  
-h,help!       show this help message and exit
+h,help!       Show this help message and exit
 "
 
 # normalize options, set up shell functions, define $GIT_DIR, $GIT_OBJECT_DIRECTORY
