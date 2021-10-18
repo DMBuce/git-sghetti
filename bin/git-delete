@@ -10,7 +10,7 @@ OPTIONS_STUCKLONG=
 OPTIONS_SPEC="\
 ${prog/-/ }
 
-Create the remote repository.
+Delete the remote repository.
 --
 "
 
@@ -50,15 +50,29 @@ fi
 # harcoded behavior
 case "$flavor" in
 	ssh)
-		exec git ssh init --bare
+		# determine ssh target
+		target="$host"
+		if [[ -n "$user" ]]; then
+			target="$user@$host"
+		fi
+
+		# prompt user (with `rm -I`) and remove remote repo
+		set -x
+		exec ssh "$target" "rm -rvI $dir"
 	;;
 	hub)
-		exec git hub create "${dir#/}"
+		exec git hub delete "${dir#/}"
 	;;
-	# TODO: test this
-	#aur)
-	#	exec git fetch
-	#;;
+	aur)
+		# aur's api doesn't support disowning packages or requesting deletion,
+		# so just tell the user what to do
+		pkg="${dir%.git}"
+		pkg="${pkg#/}"
+		echo "Log into AUR to manually delete or disown from the package page:"
+		echo "  https://$host/packages/$pkg/"
+		echo
+		echo "Select 'Disown Package' to disown or 'Submit Request' to request deletion."
+	;;
 	*)
 		die "Flavor not implemented for '$action': $flavor"
 	;;
