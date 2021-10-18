@@ -23,11 +23,11 @@ remote_url() {
 parse_url() {
 	# parse args
 	local url="$1"
-	scheme=
 	flavor=
+	scheme=
 	proto=
-	user=
 	host=
+	user=
 	dir=
 	# figure out type, proto, user, host[:port], dir from url
 	if [[ $url == /* ]]; then
@@ -95,7 +95,7 @@ parse_url() {
 			break
 		fi
 	done < <( \
-		var_re="(url|scheme|flavor|proto|user|host|dir)"
+		var_re="(url|flavor|scheme|proto|host|user|dir)"
 		git config --get-regexp "^sghetti\.rule[0-9]{3}\.$var_re-(matches|equals)$" \
 		| sed 's/\./ /; s/\./ /; s/-/ /' \
 		| LC_ALL=C sort
@@ -163,11 +163,11 @@ for url in "$@"; do
 	((i++)) && echo
 	printf "%s\n" \
 		"${url@A}" \
-		"${scheme@A}" \
 		"${flavor@A}" \
+		"${scheme@A}" \
 		"${proto@A}" \
-		"${user@A}" \
 		"${host@A}" \
+		"${user@A}" \
 		"${dir@A}"
 done
 
