@@ -4,9 +4,9 @@
 prog="${0##*/}"
 SUBDIRECTORY_OK=Yes
 NONGIT_OK=
-USAGE='<command>'
+USAGE='<subcommand>'
 LONG_USAGE="SSH into the upstream repository of the current branch ('origin' by default) and
-run \`<command>\`."
+run \`git <subcommand>\`."
 
 # set up shell functions, define $GIT_DIR, $GIT_OBJECT_DIRECTORY
 . "$(git --exec-path)/git-sh-setup"
@@ -17,7 +17,7 @@ if [[ -z "$*" || "$*" == *--help* ]]; then
 fi
 
 # parse args
-cmd="$*"
+subcmd="$*"
 
 # parse remote url
 . git-sghetti
@@ -33,7 +33,7 @@ if [[ -n "$user" ]]; then
 	target="$user@$host"
 fi
 
-# run command from remote repo
+# run subcommand from remote repo
 set -x
-ssh "$target" "mkdir -p $dir && cd $dir || exit; $cmd"
+ssh "$target" "mkdir -p $dir && cd $dir || exit; git $subcmd"
 
