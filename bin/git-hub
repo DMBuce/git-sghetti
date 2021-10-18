@@ -1,0 +1,57 @@
+#!/bin/bash
+
+# define some vars
+prog="${0##*/}"
+SUBDIRECTORY_OK=Yes
+NONGIT_OK=
+USAGE='<subcommand>'
+LONG_USAGE="\
+Run \`hub <subcommand>\` with url-driven multi-user support.
+
+Requires sghetti rules to detect hub-flavored remotes. For example:
+
+    git config --global sghetti.rule555.url-matches '.*github.com[:/](username1|username2)/.*'
+    git config --global sghetti.rule555.set-flavor  hub
+    git config --global sghetti.rule555.set-user    '\1'"
+
+# set up shell functions, define $GIT_DIR, $GIT_OBJECT_DIRECTORY
+. "$(git --exec-path)/git-sh-setup"
+
+# check args
+if [[ -z "$*" || "$*" == *--help* ]]; then
+	die "$LONG_USAGE"
+fi
+
+# parse args
+subcmd=("$@")
+
+# parse remote url
+. git-sghetti
+
+# make sure we have a hub url
+if [[ "$flavor" != *hub ]]; then
+	die "Not a GitHub url: $url"
+fi
+
+# set environment for hub
+HUB_PROTOCOL="https"
+GITHUB_HOST="$host"
+GITHUB_USER="$user"
+
+# prompt user for token if necessary
+tokenfile="$confdir/$user.token"
+if [[ ! -f $tokenfile ]]; then
+	echo "Enter a GitHub personal access token (PAT) below. To generate a new one, visit:"
+	echo "  https://github.com/settings/tokens"
+	read -rs -p "GitHub PAT for $user: " token || exit
+	echo
+	touch "$tokenfile" || exit
+	chmod 600 "$tokenfile"
+	echo "$token" > "$tokenfile" || exit
+	echo "Stored in $tokenfile"
+	echo
+fi
+
+# run hub with user credentials
+HUB_CONFIG="$hubconfig" GITHUB_TOKEN="$(<"$tokenfile")" hub "${subcmd[@]}"
+
