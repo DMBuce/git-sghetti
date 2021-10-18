@@ -3,7 +3,7 @@
 # prints the remote url
 remote_url() {
 	# figure out remote url for current branch
-	branch="$(git rev-parse --abbrev-ref HEAD)"
+	branch="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
 	remote="$(git config --default origin "branch.$branch.remote")"
 	url="$(git config "remote.$remote.url")"
 
