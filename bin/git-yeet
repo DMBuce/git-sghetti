@@ -1,0 +1,82 @@
+#!/bin/bash
+
+# define some vars
+prog="${0##*/}"
+action="${prog#git-}"
+SUBDIRECTORY_OK=Yes
+NONGIT_OK=
+OPTIONS_KEEPDASHDASH=
+OPTIONS_STUCKLONG=
+OPTIONS_SPEC="\
+${prog/-/ }
+
+\`git shove\` really hard.
+--
+"
+
+# normalize options, set up shell functions, define $GIT_DIR, $GIT_OBJECT_DIRECTORY
+. "$(git --exec-path)/git-sh-setup"
+
+# parse options
+while (( $# )); do
+	case "$1" in
+		--)
+			shift
+			break
+		;;
+		-*)
+			die "Unimplemented option (this is a bug): $1"
+		;;
+		*)
+			break
+		;;
+	esac
+	shift
+done
+
+# parse remote url
+. git-sghetti
+
+# let the user override this script on a per-flavor or per-action basis
+helper="git-sghetti--$flavor" 
+if command -v "$helper-$action" &>/dev/null; then
+	exec "$helper-$action" \
+		"$action" "$url" "$flavor" "$scheme" "$proto" "$host" "$user" "$dir"
+elif command -v "$helper" &>/dev/null; then
+	exec "$helper" \
+		"$action" "$url" "$flavor" "$scheme" "$proto" "$host" "$user" "$dir"
+fi
+
+# harcoded behavior
+case "$flavor" in
+	ssh|hub)
+		# find aur dir
+		aurdir="$(git config aur.dir)"
+		if [[ -z "$aurdir" ]]; then
+			echo "Configure an AUR dir:" >&2
+			echo >&2
+			echo "    git config --global aur.dir /path/to/aur/dir" >&2
+			echo >&2
+			echo "Each subdirectory of the AUR dir should be a git clone of the AUR package" >&2
+			echo "you plan to yeet." >&2
+			exit 1
+		fi
+
+		# make sure aur dir exists
+		pkg="${dir%.git}"
+		pkg="${pkg#/}"
+		if [[ ! -d "$aurdir/$pkg" ]]; then
+			die "No such directory: $aurdir/$pkg"
+		fi
+
+		# yeet
+		git shove && cd "$aurdir/$pkg" && git shove
+	;;
+	aur)
+		git shove && git push
+	;;
+	*)
+		die "Flavor not implemented for '$action': $flavor"
+	;;
+esac
+
