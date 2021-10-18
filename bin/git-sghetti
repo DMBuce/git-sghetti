@@ -102,6 +102,10 @@ parse_url() {
 	)
 }
 
+# env vars
+export confdir="${XDG_CONFIG_HOME:-$HOME/.config}/sghetti"
+mkdir -p "$confdir"
+
 # just set the url properties if this script was sourced
 if [[ "${BASH_SOURCE[0]}" != "$0" ]]; then
 	url="$(remote_url)" || exit
