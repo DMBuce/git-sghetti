@@ -65,12 +65,24 @@ case "$flavor" in
 		# make sure aur dir exists
 		pkg="${dir%.git}"
 		pkg="${pkg#/}"
-		if [[ ! -d "$aurdir/$pkg" ]]; then
-			die "No such directory: $aurdir/$pkg"
+		if [[ -d "$aurdir/$pkg-git" ]]; then
+			makepkgdir="$aurdir/$pkg-git"
+		elif [[ -d "$aurdir/$pkg" ]]; then
+			makepkgdir="$aurdir/$pkg"
+		else
+			die "Can't find makepkg folder for package: $pkg"
 		fi
 
 		# yeet
-		git shove && cd "$aurdir/$pkg" && git shove
+		git shove && cd "$makepkgdir" && makepkg
+		pkgfile="$(
+			shopt -s nullglob
+			find "$pkg-"*.pkg.tar.* -type f -printf "%T@ %p\n" \
+				| sort -n \
+				| cut -d' ' -f 2- \
+				| tail -n 1
+		)"
+		[[ -n "$pkgfile" ]] && addpkg "$pkgfile"
 	;;
 	aur)
 		git shove
