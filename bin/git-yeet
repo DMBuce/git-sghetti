@@ -73,7 +73,7 @@ case "$flavor" in
 		git shove && cd "$aurdir/$pkg" && git shove
 	;;
 	aur)
-		git shove && git push
+		git shove
 	;;
 	*)
 		die "Flavor not implemented for '$action': $flavor"
