@@ -74,15 +74,7 @@ case "$flavor" in
 		fi
 
 		# yeet
-		git shove && cd "$makepkgdir" && makepkg
-		pkgfile="$(
-			shopt -s nullglob
-			find "$pkg-"*.pkg.tar.* -type f -printf "%T@ %p\n" \
-				| sort -n \
-				| cut -d' ' -f 2- \
-				| tail -n 1
-		)"
-		[[ -n "$pkgfile" ]] && addpkg "$pkgfile"
+		git shove && cd "$makepkgdir" && makepkg && addpkg
 	;;
 	aur)
 		git shove
