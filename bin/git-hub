@@ -12,7 +12,18 @@ Requires sghetti rules to detect hub-flavored remotes. For example:
 
     git config --global sghetti.rule555.url-matches '.*github.com[:/](username1|username2)/.*'
     git config --global sghetti.rule555.set-flavor  hub
-    git config --global sghetti.rule555.set-user    '\1'"
+    git config --global sghetti.rule555.set-user    '\1'
+
+The setting for 'set-flavor' must end in 'hub' for the rule to work with \`${prog/-/ }\`.
+
+The \`hub\` command requires a GitHub remote to function.
+If the upstream url isn't hub flavored, \`${prog/-/ }\` tries to obtain a
+hub-flavored url from remotes named origin, github, and upstream,
+in order of preference.
+
+If no such url is found and the upstream url is ssh flavored,
+\`${prog/-/ }\` tries to obtain a hub-flavored url from upstream's remote
+by sshing into it. If such a url is found, hub creates a remote with it."
 
 # set up shell functions, define $GIT_DIR, $GIT_OBJECT_DIRECTORY
 . "$(git --exec-path)/git-sh-setup"
@@ -27,6 +38,39 @@ subcmd=("$@")
 
 # parse remote url
 . git-sghetti
+
+# try to find a hub flavored url from remotes named origin, github, or upstream
+origflavor="$flavor"
+if [[ $flavor != *hub ]]; then
+	for r in origin github upstream; do
+		if url="$(git remote get-url $r 2>/dev/null)"; then
+			. <(git sghetti "$url" 2>/dev/null)
+			[[ $flavor == *hub ]] && break
+		fi
+	done
+fi
+
+# try to find a hub flavored url from upstream's remote
+if [[ $flavor != *hub && $origflavor == ssh ]]; then
+	# obtain upstream's remote url and parse it
+	. <(git ssh sghetti || echo exit 1)
+	. <(git sghetti "$url" 2>/dev/null)
+
+	# if we found a suitable url, create a new remote for it
+	if [[ $flavor == *hub ]]; then
+		for r in origin github upstream; do
+			if ! git remote get-url $r 2>/dev/null; then
+				git remote add "$r" "$url"
+				break
+			fi
+		done
+
+		# bail if we couldn't add the new remote
+		if [[ "$(git remote get-url $r)" != "$url" ]]; then
+			die "Couldn't create remote for url: $url"
+		fi
+	fi
+fi
 
 # make sure we have a hub url
 if [[ "$flavor" != *hub ]]; then
