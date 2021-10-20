@@ -6,7 +6,7 @@ depth="${depth:-2}"
 while read dir; do
 	[[ "$dir" == */.git ]] && dir="${dir%/.git}"
 	cd "$dir"
-	"$@" 2>&1 | sed "s/^/$dir: /"
+	"$@" 2>&1 | sed "s/^/${dir//\//\\/}: /"
 	cd - >/dev/null
 done < <(find * -maxdepth "$depth" -name \*.git)
 
