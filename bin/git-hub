@@ -33,11 +33,6 @@ if [[ "$flavor" != *hub ]]; then
 	die "Not a GitHub url: $url"
 fi
 
-# set environment for hub
-HUB_PROTOCOL="https"
-GITHUB_HOST="$host"
-GITHUB_USER="$user"
-
 # prompt user for token if necessary
 tokenfile="$confdir/$user.token"
 if [[ ! -f $tokenfile ]]; then
@@ -52,6 +47,12 @@ if [[ ! -f $tokenfile ]]; then
 	echo
 fi
 
-# run hub with user credentials
-HUB_CONFIG="$hubconfig" GITHUB_TOKEN="$(<"$tokenfile")" hub "${subcmd[@]}"
+# set environment for hub
+export HUB_PROTOCOL="https"
+export GITHUB_HOST="$host"
+export GITHUB_USER="$user"
+export GITHUB_TOKEN="$(<"$tokenfile")"
+
+# run hub
+exec hub "${subcmd[@]}"
 
