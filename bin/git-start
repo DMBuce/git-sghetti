@@ -73,6 +73,10 @@ fi
 
 # add, create, and push to the remote if it doesn't exist
 if ! git remote | grep -x "$remote"; then
+	git config --get-regexp "^start\.config\.$username\." | while read key value; do
+		key="${key#start.config.$username.}"
+		git config "$key" "$value"
+	done
 	git remote add "$remote" "$url"
 	git create "$url"
 	git push -u "$remote" "$(git symbolic-ref --short -q HEAD)"
