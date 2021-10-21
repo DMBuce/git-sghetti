@@ -49,13 +49,13 @@ while (( $# )); do
 done
 
 # parse args
-user="$1"
-[[ -z "$user" ]] && usage
+username="$1"
+[[ -z "$username" ]] && usage
 
 # get config
 read remote < <(git config --default origin start.remote.name)
 read url < <(git config --default 'https://github.com/%u/%p' start.remote.url)
-url="${url//%u/$user}"
+url="${url//%u/$username}"
 url="${url//%p/$(basename -- "${PWD%.git}")}"
 
 # bail if any of the following commands fail
@@ -79,6 +79,6 @@ fi
 
 # if upstream is an ssh remote, start it
 if [[ $flavor == ssh ]]; then
-	git ssh start
+	git ssh start "$username"
 fi
 
