@@ -1,0 +1,84 @@
+#!/bin/bash
+
+# define some vars
+prog="${0##*/}"
+action="${prog#git-}"
+SUBDIRECTORY_OK=Yes
+NONGIT_OK=Yes
+OPTIONS_KEEPDASHDASH=
+OPTIONS_STUCKLONG=
+OPTIONS_SPEC="\
+${prog/-/ } <user>
+
+Start a new project.
+
+Creates the local repository if necessary, then creates the remote repository.
+If the remote is an ssh repository, ssh in and run \`${prog/-/ } <user>\`.
+
+If the remote is not configured, the following settings are used to configure it.
+
+  git config --global start.remote.name <remote-name>
+  git config --global start.remote.url <remote-url>
+
+The string '%u' will be replaced by <user> in the url,
+and '%p' will be replaced by the current folder's name sans any '.git' suffix.
+
+The default for start.remote.name is 'origin',
+and the default for start.remote.url is 'https://github.com/%u/%p'.
+--
+"
+
+# normalize options, set up shell functions, define $GIT_DIR, $GIT_OBJECT_DIRECTORY
+. "$(git --exec-path)/git-sh-setup"
+
+# parse options
+while (( $# )); do
+	case "$1" in
+		--)
+			shift
+			break
+		;;
+		-*)
+			die "Unimplemented option (this is a bug): $1"
+		;;
+		*)
+			break
+		;;
+	esac
+	shift
+done
+
+# parse args
+user="$1"
+[[ -z "$user" ]] && usage
+
+# get config
+read remote < <(git config --default origin start.remote.name)
+read url < <(git config --default 'https://github.com/%u/%p' start.remote.url)
+url="${url//%u/$user}"
+url="${url//%p/$(basename -- "${PWD%.git}")}"
+
+# bail if any of the following commands fail
+set -e
+
+# create repo if necessary
+if ! git rev-parse --is-inside-work-tree &>/dev/null; then
+	git init
+	git commit --allow-empty -m 'Initial commit'
+fi
+
+# add, create, and push to the remote if it doesn't exist
+if ! git remote | grep -x "$remote"; then
+	git remote add "$remote" "$url"
+	git create "$url"
+	git push -u "$remote" "$(git symbolic-ref --short -q HEAD)"
+fi
+
+# parse url
+. git-sghetti
+
+# if upstream is an ssh remote, start it
+if [[ $flavor == ssh ]]; then
+	git ssh start
+fi
+

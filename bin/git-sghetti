@@ -107,7 +107,7 @@ mkdir -p "$confdir"
 
 # just set the url properties if this script was sourced
 if [[ "${BASH_SOURCE[0]}" != "$0" ]]; then
-	url="$(remote_url)" || exit
+	url="${SGHETTI_URL:-$(remote_url)}" || exit
 	parse_url "$url" || exit
 	return
 fi
