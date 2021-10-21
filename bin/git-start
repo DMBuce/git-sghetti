@@ -64,6 +64,10 @@ set -e
 # create repo if necessary
 if ! git rev-parse --is-inside-work-tree &>/dev/null; then
 	git init
+	git config --get-regexp "^start\.config\.$username\." | while read key value; do
+		key="${key#start.config.$username.}"
+		git config "$key" "$value"
+	done
 	git commit --allow-empty -m 'Initial commit'
 fi
 
