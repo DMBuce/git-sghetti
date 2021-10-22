@@ -56,7 +56,7 @@ case "$flavor" in
 		git push
 	;;
 	aur)
-		makepkg -f && addpkg
+		makepkg -f --clean && addpkg
 	;;
 	*)
 		die "Flavor not implemented for '$action': $flavor"

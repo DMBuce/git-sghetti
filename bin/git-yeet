@@ -74,7 +74,7 @@ case "$flavor" in
 		fi
 
 		# yeet
-		git shove && cd "$makepkgdir" && makepkg -f && addpkg
+		git shove && cd "$makepkgdir" && makepkg -f --clean && addpkg
 	;;
 	aur)
 		git shove
