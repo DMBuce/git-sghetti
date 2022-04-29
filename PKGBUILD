@@ -1,7 +1,7 @@
 # Maintainer: Buce <dmbuce@gmail.com>
 
 pkgname=git-sghetti
-pkgver=0.r44.gba99a51
+pkgver=0.r48.gcf1dd73
 pkgver() {
   cd "$srcdir/$pkgname"
   if ! git describe --tags 2>/dev/null; then
