@@ -7,13 +7,8 @@ NONGIT_OK=Yes
 USAGE=''
 LONG_USAGE='Open a random git man page.'
 
-# parse $OPTIONS_SPEC and process --help option
+# set up shell functions, define $GIT_DIR, $GIT_OBJECT_DIRECTORY
 . "$(git --exec-path)/git-sh-setup"
-
-# check args
-if [[ "$*" == *--help* ]]; then
-	die "$LONG_USAGE"
-fi
 
 # show random git-* man page
 manpath="$(manpath)"
