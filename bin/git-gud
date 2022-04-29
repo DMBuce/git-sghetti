@@ -14,30 +14,10 @@ Open a random git man page.
 h,help!       Show this help message and exit
 "
 
-# normalize options, set up shell functions, define $GIT_DIR, $GIT_OBJECT_DIRECTORY
+# parse $OPTIONS_SPEC and process --help option
 . "$(git --exec-path)/git-sh-setup"
 
-# parse options
-while (( $# )); do
-	case "$1" in
-		-h|--help)
-			usage
-		;;
-		--)
-			shift
-			break
-		;;
-		-*)
-			die "Unimplemented option (this is a bug): $1"
-		;;
-		*)
-			break
-		;;
-	esac
-	shift
-done
-
-# do the thing
+# show random git-* man page
 manpath="$(manpath)"
 man "$(find ${manpath//:/ } -type f | grep -o 'git-[^.]*' | shuf -n1)"
 
