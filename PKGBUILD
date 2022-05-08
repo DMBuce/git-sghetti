@@ -1,7 +1,7 @@
 # Maintainer: Buce <dmbuce@gmail.com>
 
 pkgname=git-sghetti
-pkgver=0.r48.gcf1dd73
+pkgver=0.r50.g3d9d16d
 pkgver() {
   cd "$srcdir/$pkgname"
   if ! git describe --tags 2>/dev/null; then
@@ -12,7 +12,7 @@ pkgrel=1
 pkgdesc="A tangled pile of git scripts."
 arch=(any)
 url="https://github.com/DMBuce/git-sghetti"
-license=('unknown')
+license=('GPL3')
 groups=()
 depends=(
   git
