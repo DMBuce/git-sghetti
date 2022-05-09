@@ -43,7 +43,7 @@ fi
 . git-sghetti
 
 # let the user override this script on a per-flavor or per-action basis
-helper="git-sghetti--$flavor" 
+helper="git-sghetti--$flavor"
 if command -v "$helper-$action" &>/dev/null; then
 	exec "$helper-$action" \
 		"$action" "$url" "$flavor" "$scheme" "$proto" "$host" "$user" "$dir"

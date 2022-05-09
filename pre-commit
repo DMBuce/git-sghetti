@@ -29,7 +29,7 @@ then
 	# try to show files with non-ascii filenames
 	git diff --cached --name-only --diff-filter=A -z $against \
 		| tr '\0' '\n' \
-		| grep '[ -~]' 
+		| grep '[ -~]'
 	echo "Non-ASCII filenames detected. Rename them before committing."
 	exit 1
 fi
