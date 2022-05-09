@@ -34,14 +34,6 @@ then
 	exit 1
 fi
 
-# unstage PKGBUILD if only the pkgver changed
-if ! git diff --cached PKGBUILD \
-	| grep -v -e '^[+-]pkgver' -e\^{---,+++}' [ab]/PKGBUILD' \
-	| grep '^[+-]'
-then
-	git restore --staged PKGBUILD
-fi
-
 ## update the version
 #verfile=bin/myscript
 #srcfiles=(
@@ -79,15 +71,21 @@ fi
 #make doc
 #git add doc/* README.asciidoc
 
+# unstage PKGBUILD if only the pkgver changed
+if ! git diff --cached PKGBUILD \
+	| egrep -v -e '^[+-]\s*pkgver\s*=' -e '^[+-]{3}' \
+	| grep -q '^[+-]'
+then
+	git restore --staged PKGBUILD
+fi
+
 ## aur: update .SRCINFO, based on:
 ## https://github.com/eli-schwartz/aurpublish/blob/master/pre-commit.hook
-#for path in $(git diff --name-only --cached); do
-#	dir="$(dirname "$path")"
-#	if [[ "$path" =~ .*PKGBUILD$ && -d "$dir" ]]; then
-#		echo "Updating .SRCINFO metadata..."
-#		( cd "$dir" && makepkg --printsrcinfo > .SRCINFO )
-#		git add "$dir/.SRCINFO"
-#	fi
+#git diff --cached --name-status | grep -q "^[AM].*PKGBUILD" | while read M file; do
+#	dir="$(dirname "$file")"
+#	echo "Updating .SRCINFO metadata..."
+#	( cd "$dir" && makepkg --printsrcinfo > .SRCINFO )
+#	git add "$dir/.SRCINFO"
 #done
 
 ## jekyll: update last_modified_at date in frontmatter
