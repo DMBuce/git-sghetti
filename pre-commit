@@ -71,12 +71,12 @@ fi
 #make doc
 #git add doc/* README.asciidoc
 
-# unstage a file if the only lines in it that changed match a pattern
+# unstage a file if the only lines in it that changed start with a pattern
 file=PKGBUILD
 lname='$pkgver'
-pattern='^[+-]\s*pkgver\s*='
+pattern='\s*pkgver\s*='
 if ! git diff --cached "$file" \
-	| egrep -v -e "$pattern" -e '^[+-]{3}' \
+	| egrep -v -e "^[+-]$pattern" -e '^[+-]{3}' \
 	| grep -q '^[+-]'
 then
 	echo "Unstaging $file because only $lname changed..."
