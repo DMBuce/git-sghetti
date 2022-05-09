@@ -1,0 +1,6 @@
+#!/bin/bash -e
+
+# sync repo
+git pull
+git push
+
