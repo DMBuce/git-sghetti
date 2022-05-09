@@ -1,0 +1,14 @@
+pkgbase = git-sghetti
+	pkgdesc = A tangled pile of git scripts.
+	pkgver = 0.r51.gde67838
+	pkgrel = 1
+	url = https://github.com/DMBuce/git-sghetti
+	arch = any
+	license = GPL3
+	makedepends = git
+	depends = git
+	depends = hub
+	source = git-sghetti::git+https://github.com/DMBuce/git-sghetti.git
+	md5sums = SKIP
+
+pkgname = git-sghetti
