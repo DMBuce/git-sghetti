@@ -71,12 +71,16 @@ fi
 #make doc
 #git add doc/* README.asciidoc
 
-# unstage PKGBUILD if only the pkgver changed
-if ! git diff --cached PKGBUILD \
-	| egrep -v -e '^[+-]\s*pkgver\s*=' -e '^[+-]{3}' \
+# unstage a file if the only lines in it that changed match a pattern
+file=PKGBUILD
+lname='$pkgver'
+pattern='^[+-]\s*pkgver\s*='
+if ! git diff --cached "$file" \
+	| egrep -v -e "$pattern" -e '^[+-]{3}' \
 	| grep -q '^[+-]'
 then
-	git restore --staged PKGBUILD
+	echo "Unstaging $file because only $lname changed..."
+	git restore --staged "$file"
 fi
 
 ## aur: update .SRCINFO, based on:
