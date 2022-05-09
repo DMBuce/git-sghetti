@@ -1,12 +1,10 @@
 #!/bin/bash
 
-depth="$(git config rim.depth)"
-depth="${depth:-2}"
-
+# run command in each git subdirectory
 while read dir; do
 	[[ "$dir" == */.git ]] && dir="${dir%/.git}"
 	cd "$dir"
-	"$@" 2>&1 | sed "s/^/${dir//\//\\/}: /"
+	eval "$*" 2>&1 | sed "s/^/${dir//\//\\/}: /"
 	cd - >/dev/null
-done < <(find * -maxdepth "$depth" -name \*.git)
+done < <(shopt -s nullglob; find *{,/*}{.git,/.git} -maxdepth 0 -type d)
 
