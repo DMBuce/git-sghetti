@@ -112,6 +112,13 @@ if [[ "${BASH_SOURCE[0]}" != "$0" ]]; then
 	return
 fi
 
+# run git-sghetti--foo if necessary
+prog="${0##*/}"
+if [[ $1 != /* && $1 != *:* ]] && command -v "$prog--$1" &>/dev/null; then
+	#printf "%s\n" "$prog--$1" "${@:2}" >&2
+	exec "$prog--$1" "${@:2}"
+fi
+
 # define some vars
 prog="${0##*/}"
 SUBDIRECTORY_OK=Yes
@@ -120,9 +127,13 @@ OPTIONS_KEEPDASHDASH=
 OPTIONS_STUCKLONG=
 OPTIONS_SPEC="\
 ${prog/-/ } [url [...]]
+${prog/-/ } <subcommand>
 
 Print the properties (scheme, flavor, proto, user, host, and dir) of each url.
 If no <url>s are provided, the upstream remote of the current branch is used.
+
+If the first argument does not contain '/' or ':', interpet all arguments as a
+git-sghetti subcommand to run instead of a url.
 
 If this script is sourced, define the url properties as shell variables instead
 of printing them.
