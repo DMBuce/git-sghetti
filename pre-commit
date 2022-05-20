@@ -71,16 +71,21 @@ fi
 ## run tests
 #make -kB check
 
-# unstage a file if the only lines in it that changed start with a pattern
-file=PKGBUILD
-name='$pkgver'
-pattern='^pkgver='
-if  !  git diff --cached --exit-code --quiet "$file" \
-	&& git diff --cached --exit-code --quiet -I"$pattern" "$file"
-then
-	echo "Unstaging $file because only $name changed..."
-	git restore --staged "$file"
-fi
+# unstages files whose only changed lines match a pattern
+unstage-nonchanges() {
+	local pattern="$1"
+	shift
+	local file
+	for file in "$@"; do
+		if  !  git diff --cached --exit-code --quiet "$file" \
+			&& git diff --cached --exit-code --quiet -I"$pattern" "$file"
+		then
+			echo "Unstaging $file. Only lines matching '$pattern' changed..."
+			git restore --staged "$file"
+		fi
+	done
+}
+unstage-nonchanges '^pkgver=' PKGBUILD
 
 ## aur: update .SRCINFO, based on:
 ## https://github.com/eli-schwartz/aurpublish/blob/master/pre-commit.hook
