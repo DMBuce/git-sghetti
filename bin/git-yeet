@@ -37,16 +37,6 @@ done
 # parse remote url
 . git-sghetti
 
-# let the user override this script on a per-flavor or per-action basis
-helper="git-sghetti--$flavor"
-if command -v "$helper-$action" &>/dev/null; then
-	exec "$helper-$action" \
-		"$action" "$url" "$flavor" "$scheme" "$proto" "$host" "$user" "$dir"
-elif command -v "$helper" &>/dev/null; then
-	exec "$helper" \
-		"$action" "$url" "$flavor" "$scheme" "$proto" "$host" "$user" "$dir"
-fi
-
 # harcoded behavior
 case "$flavor" in
 	ssh|hub)
