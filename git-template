@@ -2,12 +2,13 @@
 
 # define some vars
 prog="${0##*/}"
+action="${prog#git-sghetti--}"
 SUBDIRECTORY_OK=Yes
 NONGIT_OK=Yes
 OPTIONS_KEEPDASHDASH=
 OPTIONS_STUCKLONG=
 OPTIONS_SPEC="\
-${prog/-/ } [-f|--foo] [-b|--bar <arg>] [--baz <baz-arg>] <args>
+${prog/-sghetti--/ sghetti } [-f|--foo] [-b|--bar <arg>] [--baz <baz-arg>] <args>
 
 Do something with <args>.
 --

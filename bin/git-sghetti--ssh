@@ -2,19 +2,53 @@
 
 # define some vars
 prog="${0##*/}"
+action="${prog#git-sghetti--}"
 SUBDIRECTORY_OK=Yes
 NONGIT_OK=
-USAGE='<subcommand>'
-LONG_USAGE="SSH into the upstream repository of the current branch ('origin' by default) and
-run \`git <subcommand>\`."
+OPTIONS_KEEPDASHDASH=
+OPTIONS_STUCKLONG=
+OPTIONS_SPEC="\
+${prog/-sghetti--/ sghetti } <subcommand>
 
-# set up shell functions, define $GIT_DIR, $GIT_OBJECT_DIRECTORY
+SSH into the upstream repository of the current branch ('origin' by default) and
+run \`git <subcommand>\`.
+--
+"
+
+# slurp up args so git-sh-setup doesn't choke on them
+args=("$@")
+[[ "$*" != -h ]] && set --
+
+# normalize options, set up shell functions, define $GIT_DIR, $GIT_OBJECT_DIRECTORY
 . "$(git --exec-path)/git-sh-setup"
 
-# check args
-if [[ -z "$*" || "$*" == *--help* ]]; then
-	die "$LONG_USAGE"
+# reset args
+set -- "${args[@]}"
+
+# print help output if called with no args
+if [[ -z "$*" || "$*" == '--' ]]; then
+	usage
 fi
+
+# parse options
+while (( $# )); do
+	case "$1" in
+		-h|--help)
+			usage
+		;;
+		--)
+			shift
+			break
+		;;
+		-*)
+			die "Unimplemented option (this is a bug): $1"
+		;;
+		*)
+			break
+		;;
+	esac
+	shift
+done
 
 # parse args
 subcmd="$*"
