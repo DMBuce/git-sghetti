@@ -2,18 +2,20 @@
 
 # define some vars
 prog="${0##*/}"
-action="${prog#git-}"
+action="${prog#git-sghetti--}"
+oldprog="$prog"
+prog="${prog/-sghetti--/ sghetti }"
 SUBDIRECTORY_OK=Yes
 NONGIT_OK=Yes
 OPTIONS_KEEPDASHDASH=
 OPTIONS_STUCKLONG=
 OPTIONS_SPEC="\
-${prog/-/ } <user>
+$prog <user>
 
 Start a new project.
 
 Creates the local repository if necessary, then creates the remote repository.
-If the remote is an ssh repository, ssh in and run \`${prog/-/ } <user>\`.
+If the remote is an ssh repository, ssh in and run \`$prog <user>\`.
 
 If the remote is not configured, the following settings are used to configure it.
 

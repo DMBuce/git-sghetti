@@ -2,10 +2,16 @@
 
 # define some vars
 prog="${0##*/}"
+action="${prog#git-sghetti--}"
+oldprog="$prog"
+prog="${prog/-sghetti--/ sghetti }"
 SUBDIRECTORY_OK=Yes
 NONGIT_OK=
-USAGE='<subcommand>'
-LONG_USAGE="\
+OPTIONS_KEEPDASHDASH=
+OPTIONS_STUCKLONG=
+OPTIONS_SPEC="\
+$prog <subcommand>
+
 Run \`hub <subcommand>\` with url-driven multi-user support.
 
 Requires sghetti rules to detect hub-flavored remotes. For example:
@@ -14,24 +20,53 @@ Requires sghetti rules to detect hub-flavored remotes. For example:
     git config --global sghetti.rule555.set-flavor  hub
     git config --global sghetti.rule555.set-user    '\1'
 
-The setting for 'set-flavor' must end in 'hub' for the rule to work with \`${prog/-/ }\`.
+The setting for 'set-flavor' must end in 'hub' for the rule to work with \`$prog\`.
 
 The \`hub\` command requires a GitHub remote to function.
-If the upstream url isn't hub flavored, \`${prog/-/ }\` tries to obtain a
+If the upstream url isn't hub flavored, \`$prog\` tries to obtain a
 hub-flavored url from remotes named origin, github, and upstream,
 in order of preference.
 
 If no such url is found and the upstream url is ssh flavored,
-\`${prog/-/ }\` tries to obtain a hub-flavored url from upstream's remote
-by sshing into it. If such a url is found, hub creates a remote with it."
+\`$prog\` tries to obtain a hub-flavored url from upstream's remote
+by sshing into it. If such a url is found, hub creates a remote with it.
+--
+"
 
-# set up shell functions, define $GIT_DIR, $GIT_OBJECT_DIRECTORY
+# slurp up args so git-sh-setup doesn't choke on them
+args=("$@")
+[[ "$*" != -h ]] && set --
+
+# normalize options, set up shell functions, define $GIT_DIR, $GIT_OBJECT_DIRECTORY
 . "$(git --exec-path)/git-sh-setup"
 
-# check args
-if [[ -z "$*" || "$*" == *--help* ]]; then
-	die "$LONG_USAGE"
+# reset args
+set -- "${args[@]}"
+
+# print help output if called with no args
+if [[ -z "$*" || "$*" == '--' ]]; then
+	usage
 fi
+
+# parse options
+while (( $# )); do
+	case "$1" in
+		-h|--help)
+			usage
+		;;
+		--)
+			shift
+			break
+		;;
+		-*)
+			die "Unimplemented option (this is a bug): $1"
+		;;
+		*)
+			break
+		;;
+	esac
+	shift
+done
 
 # parse args
 subcmd=("$@")

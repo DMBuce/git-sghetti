@@ -2,13 +2,15 @@
 
 # define some vars
 prog="${0##*/}"
-action="${prog#git-}"
+action="${prog#git-sghetti--}"
+oldprog="$prog"
+prog="${prog/-sghetti--/ sghetti }"
 SUBDIRECTORY_OK=Yes
 NONGIT_OK=
 OPTIONS_KEEPDASHDASH=
 OPTIONS_STUCKLONG=
 OPTIONS_SPEC="\
-${prog/-/ }
+$prog
 
 \`git shove\` really hard.
 --

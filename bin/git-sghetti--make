@@ -6,7 +6,7 @@ action="${prog#git-sghetti--}"
 oldprog="$prog"
 prog="${prog/-sghetti--/ sghetti }"
 SUBDIRECTORY_OK=Yes
-NONGIT_OK=Yes
+NONGIT_OK=
 OPTIONS_KEEPDASHDASH=
 OPTIONS_STUCKLONG=
 OPTIONS_SPEC="\
@@ -25,15 +25,15 @@ baz!=baz-arg  Another cool option --baz with a named argument
 h,help!       Show this help message and exit
 "
 
-## slurp up args so git-sh-setup doesn't choke on them
-#args=("$@")
-#[[ "$*" != -h ]] && set --
+# slurp up args so git-sh-setup doesn't choke on them
+args=("$@")
+[[ "$*" != -h ]] && set --
 
 # normalize options, set up shell functions, define $GIT_DIR, $GIT_OBJECT_DIRECTORY
 . "$(git --exec-path)/git-sh-setup"
 
-## reset args
-#set -- "${args[@]}"
+# reset args
+set -- "${args[@]}"
 
 # print help output if called with no args
 if [[ -z "$*" || "$*" == '--' ]]; then
@@ -41,26 +41,8 @@ if [[ -z "$*" || "$*" == '--' ]]; then
 fi
 
 # parse options
-foo=0
 while (( $# )); do
 	case "$1" in
-		-f|--foo)
-			foo=1
-		;;
-		--no-foo)
-			foo=0
-		;;
-		-b|--bar)
-			shift
-			bar="$1"
-		;;
-		--no-bar)
-			unset bar
-		;;
-		--baz)
-			shift
-			baz="$1"
-		;;
 		-h|--help)
 			usage
 		;;
@@ -78,8 +60,7 @@ while (( $# )); do
 	shift
 done
 
-# do something with remaining args
-#cd_to_toplevel
-echo "$PWD> $prog $*"
-#do_thing "$@"
+# run make from git root
+cd_to_toplevel
+exec make "$@"
 

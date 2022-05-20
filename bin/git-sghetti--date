@@ -10,10 +10,9 @@ NONGIT_OK=
 OPTIONS_KEEPDASHDASH=
 OPTIONS_STUCKLONG=
 OPTIONS_SPEC="\
-$prog <subcommand>
+$prog <args>
 
-SSH into the upstream repository of the current branch ('origin' by default) and
-run \`git <subcommand>\`.
+Use the output of \`date <args>\` to change the timestamp on the last commit.
 --
 "
 
@@ -52,24 +51,7 @@ while (( $# )); do
 	shift
 done
 
-# parse args
-subcmd="$*"
-
-# parse remote url
-. git-sghetti
-
-# make sure we have an ssh url
-if [[ "$flavor" != ssh ]]; then
-	die "Not an ssh url: $url"
-fi
-
-# determine ssh target
-target="$host"
-if [[ -n "$user" ]]; then
-	target="$user@$host"
-fi
-
-# run subcommand from remote repo
-set -x
-ssh "$target" "mkdir -p $dir && cd $dir || exit; git $subcmd"
+# change timestamp of last commit
+date="$(date "$@")" || exit
+GIT_COMMITTER_DATE="$date" git commit --amend --date "$date" --no-edit
 

@@ -2,15 +2,17 @@
 
 # define some vars
 prog="${0##*/}"
-action="${prog#git-}"
+action="${prog#git-sghetti--}"
+oldprog="$prog"
+prog="${prog/-sghetti--/ sghetti }"
 SUBDIRECTORY_OK=Yes
-NONGIT_OK=Yes
+NONGIT_OK=
 OPTIONS_KEEPDASHDASH=
 OPTIONS_STUCKLONG=
 OPTIONS_SPEC="\
-${prog/-/ }
+$prog [url]
 
-\`git push\` really hard.
+Create the remote repository for <url>. The default url is upstream.
 --
 "
 
@@ -34,25 +36,28 @@ while (( $# )); do
 	shift
 done
 
+# parse args
+if [[ -n "$1" ]]; then
+	export SGHETTI_URL="$1"
+fi
+
 # parse remote url
 . git-sghetti
 
 # harcoded behavior
 case "$flavor" in
 	ssh)
-		git push && git ssh push
+		exec git ssh init --bare
 	;;
 	hub)
-		git push
+		exec git hub create "${dir#/}"
 	;;
-	aur)
-		makepkg -f --clean && addpkg
-	;;
+	# TODO: test this
+	#aur)
+	#	exec git fetch
+	#;;
 	*)
 		die "Flavor not implemented for '$action': $flavor"
 	;;
 esac
-	#aur)
-	#	exec git fetch
-	#;;
 
