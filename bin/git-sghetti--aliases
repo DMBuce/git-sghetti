@@ -21,7 +21,7 @@ an alias configured.
 . "$(git --exec-path)/git-sh-setup"
 
 # print aliases for each git-sghetti subcommand
-compgen -c | while IFS=- read -r git sghetti null subcmd; do
+compgen -c | sort -u | while IFS=- read -r git sghetti null subcmd; do
 	[[ "$git-$sghetti-$null-" != git-sghetti-- || -z "$subcmd" ]] && continue
 	output="git config --global 'alias.$subcmd' 'sghetti $subcmd'"
 	if existing="$(git config --global "alias.$subcmd")"; then
