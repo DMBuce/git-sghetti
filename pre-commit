@@ -73,13 +73,12 @@ fi
 
 # unstage a file if the only lines in it that changed start with a pattern
 file=PKGBUILD
-lname='$pkgver'
-pattern='\s*pkgver\s*='
-if ! git diff --cached "$file" \
-	| egrep -v -e "^[+-]$pattern" -e '^[+-]{3}' \
-	| grep -q '^[+-]'
+name='$pkgver'
+pattern='^pkgver='
+if  !  git diff --cached --exit-code --quiet "$file" \
+	&& git diff --cached --exit-code --quiet -I"$pattern" "$file"
 then
-	echo "Unstaging $file because only $lname changed..."
+	echo "Unstaging $file because only $name changed..."
 	git restore --staged "$file"
 fi
 
