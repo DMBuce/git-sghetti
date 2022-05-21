@@ -2,9 +2,9 @@
 
 # define some vars
 prog="${0##*/}"
-action="${prog#git-sghetti--}"
+action="${prog#git-}"
 oldprog="$prog"
-prog="${prog/-sghetti--/ sghetti }"
+prog="${prog/-/ }"
 SUBDIRECTORY_OK=Yes
 NONGIT_OK=
 OPTIONS_KEEPDASHDASH=

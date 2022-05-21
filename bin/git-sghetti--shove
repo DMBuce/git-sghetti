@@ -42,7 +42,7 @@ done
 # harcoded behavior
 case "$flavor" in
 	ssh)
-		git push && git sghetti ssh push
+		git push && git ssh push
 	;;
 	hub)
 		git push

@@ -89,6 +89,6 @@ fi
 
 # if upstream is an ssh remote, start it
 if [[ $flavor == ssh ]]; then
-	git sghetti ssh sghetti start "$username"
+	git ssh sghetti start "$username"
 fi
 
