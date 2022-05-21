@@ -51,7 +51,7 @@ case "$flavor" in
 		makepkg -f --clean && addpkg
 	;;
 	*)
-		die "Flavor not implemented for '$action': $flavor"
+		die "Flavor not implemented for '$prog': $flavor"
 	;;
 esac
 

@@ -66,7 +66,7 @@ case "$flavor" in
 		echo "Select 'Disown Package' to disown or 'Submit Request' to request deletion."
 	;;
 	*)
-		die "Flavor not implemented for '$action': $flavor"
+		die "Flavor not implemented for '$prog': $flavor"
 	;;
 esac
 

@@ -72,7 +72,7 @@ case "$flavor" in
 		git sghetti shove
 	;;
 	*)
-		die "Flavor not implemented for '$action': $flavor"
+		die "Flavor not implemented for '$prog': $flavor"
 	;;
 esac
 
