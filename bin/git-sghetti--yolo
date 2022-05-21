@@ -12,7 +12,7 @@ OPTIONS_STUCKLONG=
 OPTIONS_SPEC="\
 $prog
 
-\`git push\` really hard.
+\`git push\` so hard you'll break your system.
 --
 "
 
@@ -40,18 +40,5 @@ done
 . git-sghetti
 
 # do the thing
-case "$flavor" in
-	ssh)
-		git push && git ssh push
-	;;
-	hub)
-		git push
-	;;
-	aur)
-		makepkg -f --clean && addpkg
-	;;
-	*)
-		die "Flavor not implemented for '$action': $flavor"
-	;;
-esac
+git sghetti yeet && sudo pacrepo -Syu
 

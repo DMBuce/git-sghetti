@@ -44,7 +44,7 @@ fi
 # parse remote url
 . git-sghetti
 
-# harcoded behavior
+# do the thing
 case "$flavor" in
 	ssh)
 		exec git ssh init --bare
