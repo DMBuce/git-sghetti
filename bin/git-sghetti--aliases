@@ -24,16 +24,15 @@ t=$'\t'
 n=$'\n'
 compgen -c | sort -u | while IFS=- read -r git sghetti null subcmd; do
 	[[ "$git-$sghetti-$null-" != git-sghetti-- || -z "$subcmd" ]] && continue
-	output="git config --global alias.$subcmd$t'sghetti $subcmd'"
-	if existing="$(git config --global "alias.$subcmd")"; then
-		comment="# already exists"
-		if [[ $existing != "sghetti $subcmd" ]]; then
-			comment="# already exists as: alias.$subcmd$t'$existing'"
-		fi
-		output="$comment$n#$output"
-	elif gitcmd="$(command -v "git-$subcmd" 2>/dev/null)"; then
-		output="# already exists as: $gitcmd$n#$output"
+	alias="$(git config --global "alias.$subcmd")"
+	gitcmd="$(PATH="$(git --exec-path):$PATH" command -v "git-$subcmd" 2>/dev/null)"
+	if [[ $alias == "sghetti $subcmd" ]]; then
+		printf "# already exists\n#"
+	elif [[ -n "$alias" ]]; then
+		printf "# already exists as: %-20s %s\n#" "alias.$subcmd" "'$alias'"
+	elif [[ -n "$gitcmd" ]]; then
+		printf "# already exists as: %-20s\n#" "$gitcmd"
 	fi
-	echo "$output"
+	printf "git config --global %-20s %s\n" "alias.$subcmd" "'sghetti $subcmd'"
 done
 
