@@ -47,10 +47,10 @@ fi
 # harcoded behavior
 case "$flavor" in
 	ssh)
-		exec git ssh init --bare
+		exec git sghetti ssh init --bare
 	;;
 	hub)
-		exec git hub create "${dir#/}"
+		exec git sghetti hub create "${dir#/}"
 	;;
 	# TODO: test this
 	#aur)

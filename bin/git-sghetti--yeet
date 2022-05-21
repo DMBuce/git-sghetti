@@ -12,7 +12,7 @@ OPTIONS_STUCKLONG=
 OPTIONS_SPEC="\
 $prog
 
-\`git shove\` really hard.
+\`git sghetti shove\` really hard.
 --
 "
 
@@ -66,10 +66,10 @@ case "$flavor" in
 		fi
 
 		# yeet
-		git shove && cd "$makepkgdir" && makepkg -f --clean && addpkg
+		git sghetti shove && cd "$makepkgdir" && makepkg -f --clean && addpkg
 	;;
 	aur)
-		git shove
+		git sghetti shove
 	;;
 	*)
 		die "Flavor not implemented for '$action': $flavor"

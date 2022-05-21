@@ -71,6 +71,13 @@ fi
 ## run tests
 #make -kB check
 
+# bail if changes match one or more patterns
+patterns="$(printf '%s\n' bin/git-sghetti--* | sed 's/.*--/git /')"
+if git diff --cached | sed -n '/^+++/d; /^+/s/+//p' | egrep -f <(echo "$patterns"); then
+	echo "Found bad lines. Fix them before committing."
+	exit 1
+fi
+
 # unstages files whose only changed lines match a pattern
 unstage-nonchanges() {
 	local pattern="$1"
@@ -80,7 +87,7 @@ unstage-nonchanges() {
 		if  !  git diff --cached --exit-code --quiet "$file" \
 			&& git diff --cached --exit-code --quiet -I"$pattern" "$file"
 		then
-			echo "Unstaging $file. Only lines matching '$pattern' changed..."
+			echo "Unstaging $file because only lines matching '$pattern' changed."
 			git restore --staged "$file"
 		fi
 	done

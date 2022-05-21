@@ -88,7 +88,7 @@ fi
 # try to find a hub flavored url from upstream's remote
 if [[ $flavor != *hub && $origflavor == ssh ]]; then
 	# obtain upstream's remote url and parse it
-	. <(git ssh sghetti || echo exit 1)
+	. <(git sghetti ssh sghetti || echo exit 1)
 	. <(git sghetti "$url" 2>/dev/null)
 
 	# if we found a suitable url, create a new remote for it

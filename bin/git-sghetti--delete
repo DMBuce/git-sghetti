@@ -53,7 +53,7 @@ case "$flavor" in
 		exec ssh "$target" "rm -rvI $dir"
 	;;
 	hub)
-		exec git hub delete "${dir#/}"
+		exec git sghetti hub delete "${dir#/}"
 	;;
 	aur)
 		# aur's api doesn't support disowning packages or requesting deletion,

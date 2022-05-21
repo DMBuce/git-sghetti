@@ -80,7 +80,7 @@ if ! git remote | grep -x "$remote"; then
 		git config "$key" "$value"
 	done
 	git remote add "$remote" "$url"
-	git create "$url"
+	git sghetti create "$url"
 	git push -u "$remote" "$(git symbolic-ref --short -q HEAD)"
 fi
 
@@ -89,6 +89,6 @@ fi
 
 # if upstream is an ssh remote, start it
 if [[ $flavor == ssh ]]; then
-	git ssh start "$username"
+	git sghetti ssh start "$username"
 fi
 
