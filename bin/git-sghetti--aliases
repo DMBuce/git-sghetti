@@ -20,17 +20,19 @@ an alias configured.
 . "$(git --exec-path)/git-sh-setup"
 
 # print aliases for each git-sghetti subcommand
+t=$'\t'
+n=$'\n'
 compgen -c | sort -u | while IFS=- read -r git sghetti null subcmd; do
 	[[ "$git-$sghetti-$null-" != git-sghetti-- || -z "$subcmd" ]] && continue
-	output="git config --global alias.$subcmd 'sghetti $subcmd'"
+	output="git config --global alias.$subcmd$t'sghetti $subcmd'"
 	if existing="$(git config --global "alias.$subcmd")"; then
 		comment="# already exists"
 		if [[ $existing != "sghetti $subcmd" ]]; then
-			comment="# already exists as: alias.$subcmd '$existing'"
+			comment="# already exists as: alias.$subcmd$t'$existing'"
 		fi
-		output="$comment"$'\n'"#$output"
+		output="$comment$n#$output"
 	elif gitcmd="$(command -v "git-$subcmd" 2>/dev/null)"; then
-		output="# already exists as: $gitcmd"$'\n'"#$output"
+		output="# already exists as: $gitcmd$n#$output"
 	fi
 	echo "$output"
 done
