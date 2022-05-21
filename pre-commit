@@ -78,7 +78,7 @@ if git diff --cached | sed -n '/^+++/d; /^+/s/+//p' | egrep -f <(echo "$patterns
 	exit 1
 fi
 
-# unstages files whose only changed lines match a pattern
+# unstage files whose only changed lines match a pattern
 unstage-nonchanges() {
 	local pattern="$1"
 	shift
@@ -96,7 +96,7 @@ unstage-nonchanges '^pkgver=' PKGBUILD
 
 ## aur: update .SRCINFO, based on:
 ## https://github.com/eli-schwartz/aurpublish/blob/master/pre-commit.hook
-#git diff --cached --name-status | grep -q "^[AM].*PKGBUILD" | while read M file; do
+#git diff --cached --name-status | grep "^[AM].*PKGBUILD" | while read M file; do
 #	dir="$(dirname "$file")"
 #	echo "Updating .SRCINFO metadata..."
 #	( cd "$dir" && makepkg --printsrcinfo > .SRCINFO )
