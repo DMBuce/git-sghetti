@@ -28,11 +28,15 @@ compgen -c | sort -u | while IFS=- read -r git sghetti null subcmd; do
 	gitcmd="$(PATH="$(git --exec-path):$PATH" command -v "git-$subcmd" 2>/dev/null)"
 	if [[ $alias == "sghetti $subcmd" ]]; then
 		printf "# already exists\n#"
+		printf "#git config --global %-17s %s\n" "alias.$subcmd" "'sghetti $subcmd'"
 	elif [[ -n "$alias" ]]; then
-		printf "# already exists as: %-20s %s\n#" "alias.$subcmd" "'$alias'"
+		printf "# already exists as: %-17s %s\n#" "alias.$subcmd" "'$alias'"
+		printf "#git config --global %-17s %s\n" "alias.$subcmd" "'sghetti $subcmd'"
 	elif [[ -n "$gitcmd" ]]; then
-		printf "# already exists as: %-20s\n#" "$gitcmd"
+		printf "# already exists as: %-17s\n#" "$gitcmd"
+		printf "#git config --global %-17s %s\n" "alias.$subcmd" "'sghetti $subcmd'"
+	else
+		printf "git config --global %-18s %s\n" "alias.$subcmd" "'sghetti $subcmd'"
 	fi
-	printf "git config --global %-20s %s\n" "alias.$subcmd" "'sghetti $subcmd'"
 done
 
