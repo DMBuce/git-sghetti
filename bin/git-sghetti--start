@@ -13,19 +13,29 @@ $prog <user>
 
 Start a new project.
 
-Creates the local repository if necessary, then creates the remote repository.
-If the remote is an ssh repository, ssh in and run \`$prog <user>\`.
+Creates the local repository if necessary, then creates the remote
+repository and pushes to it. If there are start.config.\$user.* settings
+in git's config, thay are applied to the local git config without the
+'start.config.\$user' prefix.  If the remote is an ssh repository,
+ssh in and run \`$prog <user>\`.
 
-If the remote is not configured, the following settings are used to configure it.
+Once the repository is intialized, if the git config start.post-init
+exists, '$prog' runs it.
 
+If the remote is not configured, the following settings are used to
+configure it, with 'start.config' settings taking precedence over
+'start.config' ones.
+
+  git config --global start.remote.\$user.name <remote-name>
   git config --global start.remote.name <remote-name>
+  git config --global start.remote.\$user.url <remote-url>
   git config --global start.remote.url <remote-url>
 
-The string '%u' will be replaced by <user> in the url,
-and '%p' will be replaced by the current folder's name sans any '.git' suffix.
+The string '%u' will be replaced by <user> in the url, and '%p' will be
+replaced by the current folder's name sans any '.git' suffix.
 
-The default for start.remote.name is 'origin',
-and the default for start.remote.url is 'https://github.com/%u/%p'.
+The default for start.remote.name is 'origin', and the default for
+start.remote.url is 'https://github.com/%u/%p'.
 --
 "
 
@@ -54,8 +64,10 @@ username="$1"
 [[ -z "$username" ]] && usage
 
 # get config
-read remote < <(git config --default origin start.remote.name)
-read url < <(git config --default 'https://github.com/%u/%p' start.remote.url)
+remote="$(git config "start.remote.$username.name")"
+remote="${remote-$(git config --default origin start.remote.name)}"
+url="$(git config "start.remote.$username.url")"
+url="${url-$(git config --default 'https://github.com/%u/%p' start.remote.url)}"
 url="${url//%u/$username}"
 url="${url//%p/$(basename -- "${PWD%.git}")}"
 
@@ -69,6 +81,9 @@ if ! git rev-parse --is-inside-work-tree &>/dev/null; then
 		key="${key#start.config.$username.}"
 		git config "$key" "$value"
 	done
+	if [[ -n $(git config "start.post-init") ]]; then
+		$(git config "start.post-init")
+	fi
 	git commit --allow-empty -m 'Initial commit'
 fi
 

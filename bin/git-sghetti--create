@@ -51,10 +51,18 @@ case "$flavor" in
 	hub)
 		exec git sghetti hub create "${dir#/}"
 	;;
-	# TODO: test this
-	#aur)
-	#	exec git fetch
-	#;;
+	aur)
+		# aur requires a .SRCINFO, so generate one if possible
+		set -e
+		cd_to_toplevel
+		if [[ -f PKGBUILD ]]; then
+			makepkg --printsrcinfo > .SRCINFO
+			git add PKGBUILD .SRCINFO
+			git commit --amend --no-edit
+		else
+			die "No such file: PKGBUILD"
+		fi
+	;;
 	*)
 		die "Flavor not implemented for '$prog': $flavor"
 	;;
