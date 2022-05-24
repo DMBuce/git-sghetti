@@ -99,7 +99,7 @@ case "$flavor" in
 		editmsg="$GIT_DIR/RELEASE_EDITMSG"
 		{
 			printf "Version %s\n\n# Changes\n\n" "$version"
-			git log --pretty='format:%w(-1,0,4)%B' "${oldver+$oldver..}HEAD"
+			git log --pretty='format:%w(-1,0,4)%B' "${oldver:+$oldver..}HEAD"
 		} > "$editmsg"
 
 		# run prepare-release-msg hook
@@ -115,7 +115,7 @@ case "$flavor" in
 		editmsg="$GIT_DIR/RELEASE_EDITMSG"
 		{
 			printf "Version %s\n\n# Changes\n\n" "$version"
-			git log --pretty='format:%w(-1,0,4)%B' "${oldver+$oldver..}HEAD"
+			git log --pretty='format:%w(-1,0,4)%B' "${oldver:+$oldver..}HEAD"
 		} > "$editmsg"
 
 		# run prepare-release-msg hook
