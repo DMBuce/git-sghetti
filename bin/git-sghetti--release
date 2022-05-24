@@ -1,0 +1,137 @@
+#!/bin/bash
+
+# define some vars
+prog="${0##*/}"
+prog="${prog/-sghetti--/ sghetti }"
+SUBDIRECTORY_OK=Yes
+NONGIT_OK=
+OPTIONS_KEEPDASHDASH=
+OPTIONS_STUCKLONG=
+OPTIONS_SPEC="\
+$prog [--new-ver <version>] [files]
+
+Draft a new GitHub release. Any <files> are uploaded as assets for
+the release.
+
+To prepare a changelog for the release message, '$prog'
+pulls all tags from the remote and generates the changelog starting from
+the tag with the highest version.
+--
+ Options
+v,new-ver=version     The version to use for the new release. If
+                      <version> is 'bump' (the default), increment the
+                      tag with the highest version that ends in a digit.
+
+h,help!               Show this help message and exit
+"
+
+# normalize options, set up shell functions, define $GIT_DIR, $GIT_OBJECT_DIRECTORY
+. "$(git --exec-path)/git-sh-setup"
+
+# parse options
+version=bump
+while (( $# )); do
+	case "$1" in
+		-v|--new-ver)
+			shift
+			version="$1"
+		;;
+		--)
+			shift
+			break
+		;;
+		-*)
+			die "Unimplemented option (this is a bug): $1"
+		;;
+		*)
+			break
+		;;
+	esac
+	shift
+done
+
+# parse remote url
+. git-sghetti
+
+# parse args
+version="$1"
+shift
+hub_opts=()
+for file in "$@"; do
+	hub_opts+=(-a "$file")
+done
+
+# check args
+if [[ -z "$version" ]]; then
+	usage
+elif [[ $flavor != ssh && $flavor != hub ]]; then
+	die "Flavor not implemented for '$prog': $flavor"
+fi
+
+# bump version if necessary
+[[ $flavor == ssh ]] && git ssh pull --tags || exit
+git pull --tags || exit
+oldver="$(git tag -l '*[0-9]' --sort 'v:refname' | tail -n1)"
+if [[ "$version" == bump ]]; then
+	if [[ -z "$oldver" ]]; then
+		die "Could not bump version, please specify one with --new-ver"
+	fi
+	num="${oldver##*[^0-9]}"
+	prefix="${oldver%$num}"
+	version="$prefix$((num+1))"
+fi
+
+# do the thing
+case "$flavor" in
+	ssh)
+		# get the remote's remote url properties
+		# and export them to the environment for git-hub
+		sshurl="$url"
+		set -a
+		. <(git ssh sghetti || echo exit 1)
+		set +a
+
+		# bail if we didn't find a hub-style url
+		if [[ "$flavor" != hub ]]; then
+			die "Remote ssh repo is not 'hub' flavored: $flavor"
+		fi
+
+		# set up a github remote if one doesn't exist
+		git remote | grep -qx github || git remote add github "$url"
+
+		# create release message
+		editmsg="$GIT_DIR/RELEASE_EDITMSG"
+		{
+			printf "Version %s\n\n# Changes\n\n" "$version"
+			git log --pretty='format:%w(-1,0,4)%B' "${oldver+$oldver..}HEAD"
+		} > "$editmsg"
+
+		# run prepare-release-msg hook
+		if [[ -x "$GIT_DIR/hooks/prepare-release-msg" ]]; then
+			"$GIT_DIR/hooks/prepare-release-msg" "$editmsg" "$oldver" "$version"
+		fi
+
+		# create the release
+		exec git sghetti hub release create -d "${hub_opts[@]}" -e -F "$editmsg" "$version"
+	;;
+	hub)
+		# create release message
+		editmsg="$GIT_DIR/RELEASE_EDITMSG"
+		{
+			printf "Version %s\n\n# Changes\n\n" "$version"
+			git log --pretty='format:%w(-1,0,4)%B' "${oldver+$oldver..}HEAD"
+		} > "$editmsg"
+
+		# run prepare-release-msg hook
+		if [[ -x "$GIT_DIR/hooks/prepare-release-msg" ]]; then
+			"$GIT_DIR/hooks/prepare-release-msg" "$editmsg" "$oldver" "$version"
+		fi
+
+		# create the release
+		exec git sghetti hub release create -d "${hub_opts[@]}" -e -F "$editmsg" "$version"
+	;;
+	*)
+		die "Flavor not implemented for '$prog': $flavor"
+	;;
+esac
+
