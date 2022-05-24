@@ -2,7 +2,6 @@
 
 # define some vars
 prog="${0##*/}"
-oldprog="$prog"
 prog="${prog/-/ }"
 SUBDIRECTORY_OK=Yes
 NONGIT_OK=
