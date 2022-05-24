@@ -65,8 +65,8 @@ if [[ $flavor != ssh && $flavor != hub ]]; then
 fi
 
 # bump version if necessary
-[[ $flavor == ssh ]] && git ssh pull --tags || exit
-git pull --tags || exit
+[[ $flavor == ssh ]] && git ssh fetch --tags || exit
+git fetch --tags || exit
 oldver="$(git tag -l '*[0-9]' --sort 'v:refname' | tail -n1)"
 if [[ "$version" == bump ]]; then
 	if [[ -z "$oldver" ]]; then
