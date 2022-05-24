@@ -54,17 +54,13 @@ done
 . git-sghetti
 
 # parse args
-version="$1"
-shift
 hub_opts=()
 for file in "$@"; do
 	hub_opts+=(-a "$file")
 done
 
 # check args
-if [[ -z "$version" ]]; then
-	usage
-elif [[ $flavor != ssh && $flavor != hub ]]; then
+if [[ $flavor != ssh && $flavor != hub ]]; then
 	die "Flavor not implemented for '$prog': $flavor"
 fi
 
