@@ -98,7 +98,7 @@ case "$flavor" in
 		# create release message
 		editmsg="$GIT_DIR/RELEASE_EDITMSG"
 		{
-			printf "Version %s\n\n# Changes\n\n" "$version"
+			printf "Version %s\n\n## Changes\n\n" "$version"
 			git log --pretty='format:%w(-1,0,4)%B' "${oldver:+$oldver..}HEAD"
 		} > "$editmsg"
 
@@ -114,7 +114,7 @@ case "$flavor" in
 		# create release message
 		editmsg="$GIT_DIR/RELEASE_EDITMSG"
 		{
-			printf "Version %s\n\n# Changes\n\n" "$version"
+			printf "Version %s\n\n## Changes\n\n" "$version"
 			git log --pretty='format:%w(-1,0,4)%B' "${oldver:+$oldver..}HEAD"
 		} > "$editmsg"
 
