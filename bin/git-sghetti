@@ -4,7 +4,7 @@
 remote_url() {
 	# figure out remote url for current branch
 	url="$(git config --get remote.origin.pushurl)"
-	[[ $SGHETTI_UPSTREAM != pull ]] && url="$(git config --get remote.origin.url)"
+	[[ $SGHETTI_UPSTREAM == pull ]] && url="$(git config --get remote.origin.url)"
 	url="${url-$(git config --get remote.origin.url)}"
 
 	# check if remote has a url
