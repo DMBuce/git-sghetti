@@ -3,9 +3,11 @@
 # prints the remote url
 remote_url() {
 	# figure out remote url for current branch
-	url="$(git config --get remote.origin.pushurl)"
-	[[ $SGHETTI_UPSTREAM == pull ]] && url="$(git config --get remote.origin.url)"
-	url="${url-$(git config --get remote.origin.url)}"
+	IFS=/ read remote branch \
+		<<< "$(git rev-parse --abbrev-ref "@{upstream}" 2>/dev/null)"
+	url="$(git config --get "remote.$remote.pushurl")"
+	[[ $SGHETTI_UPSTREAM == pull ]] && url="$(git config --get "remote.$remote.url")"
+	url="${url:-$(git config --get "remote.$remote.url")}"
 
 	# check if remote has a url
 	if [[ -z "$url" ]]; then
