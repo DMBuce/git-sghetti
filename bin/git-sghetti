@@ -3,8 +3,8 @@
 # prints the remote url
 remote_url() {
 	# figure out remote url for current branch
-	upstream='@{push}'
-	[[ -n $SGHETTI_UPSTREAM && $SGHETTI_UPSTREAM != push ]] && upstream='@{upstream}'
+	upstream='@{upstream}'
+	[[ -n $SGHETTI_UPSTREAM && $SGHETTI_UPSTREAM != upstream ]] && upstream='@{push}'
 	IFS=/ read remote branch \
 		<<< "$(git rev-parse --abbrev-ref "$upstream" 2>/dev/null)"
 	url="$(git ls-remote --get-url "$remote")"
