@@ -17,9 +17,9 @@ To prepare a changelog for the release message, '$prog'
 pulls all tags from the remote and generates the changelog starting from
 the tag with the highest version.
 
-If <version> is 'bump' (the default), '$prog' determines the new version
-by taking the last line of \`git tag -l '*[[:digit:]]' --sort 'v:refname'\`
-and incrementing the rightmost number.
+If <version> is 'bump' (the default), '$prog' determines
+the new version by taking the last line of \`git tag -l '*[[:digit:]]'
+--sort 'v:refname'\` and incrementing the rightmost number.
 --
  Options
 v,new-ver=version  The version to use for the new release.
