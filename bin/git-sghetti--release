@@ -16,13 +16,15 @@ the release.
 To prepare a changelog for the release message, '$prog'
 pulls all tags from the remote and generates the changelog starting from
 the tag with the highest version.
+
+If <version> is 'bump' (the default), '$prog' determines the new version
+by taking the last line of \`git tag -l '*[[:digit:]]' --sort 'v:refname'\`
+and incrementing the rightmost number.
 --
  Options
-v,new-ver=version     The version to use for the new release. If
-                      <version> is 'bump' (the default), increment the
-                      tag with the highest version that ends in a digit.
+v,new-ver=version  The version to use for the new release.
 
-h,help!               Show this help message and exit
+h,help!            Show this help message and exit
 "
 
 # normalize options, set up shell functions, define $GIT_DIR, $GIT_OBJECT_DIRECTORY
@@ -67,12 +69,12 @@ fi
 # bump version if necessary
 [[ $flavor == ssh ]] && git ssh fetch --tags || exit
 git fetch --tags || exit
-oldver="$(git tag -l '*[0-9]' --sort 'v:refname' | tail -n1)"
+oldver="$(git tag -l '*[[:digit:]]' --sort 'v:refname' | tail -n1)"
 if [[ "$version" == bump ]]; then
 	if [[ -z "$oldver" ]]; then
 		die "Could not bump version, please specify one with --new-ver"
 	fi
-	num="${oldver##*[^0-9]}"
+	num="${oldver##*[^[:digit:]]}"
 	prefix="${oldver%$num}"
 	version="$prefix$((num+1))"
 fi
