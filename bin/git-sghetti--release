@@ -66,6 +66,11 @@ if [[ $flavor != ssh && $flavor != hub ]]; then
 	die "Flavor not implemented for '$prog': $flavor"
 fi
 
+# run pre-release hook
+if [[ -x "$GIT_DIR/hooks/pre-release" ]]; then
+	"$GIT_DIR/hooks/pre-release" || exit
+fi
+
 # bump version if necessary
 [[ $flavor == ssh ]] && git ssh fetch --tags || exit
 git fetch --tags || exit
