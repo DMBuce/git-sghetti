@@ -64,9 +64,9 @@ username="$1"
 
 # get config
 remote="$(git config "start.remote.$username.name")"
-remote="${remote-$(git config --default origin start.remote.name)}"
+remote="${remote:-$(git config --default origin start.remote.name)}"
 url="$(git config "start.remote.$username.url")"
-url="${url-$(git config --default 'https://github.com/%u/%p' start.remote.url)}"
+url="${url:-$(git config --default 'https://github.com/%u/%p' start.remote.url)}"
 url="${url//%u/$username}"
 url="${url//%p/$(basename -- "${PWD%.git}")}"
 
