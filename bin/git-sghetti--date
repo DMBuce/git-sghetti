@@ -21,14 +21,6 @@ args=("$@")
 # normalize options, set up shell functions, define $GIT_DIR, $GIT_OBJECT_DIRECTORY
 . "$(git --exec-path)/git-sh-setup"
 
-# reset args
-set -- "${args[@]}"
-
-# print help output if called with no args
-if [[ -z "$*" || "$*" == '--' ]]; then
-	usage
-fi
-
 # parse options
 while (( $# )); do
 	case "$1" in
@@ -48,6 +40,14 @@ while (( $# )); do
 	esac
 	shift
 done
+
+# reset args
+set -- "${args[@]}"
+
+# print help output if called with no args
+if [[ -z "$*" || "$*" == '--' ]]; then
+	usage
+fi
 
 # change timestamp of last commit
 date="$(date "$@")" || exit
