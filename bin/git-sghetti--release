@@ -70,7 +70,7 @@ if [[ $flavor != ssh && $flavor != hub ]]; then
 fi
 
 # run pre-release hook
-if [[ -x "$GIT_DIR/hooks/pre-release" ]]; then
+if [[ $version != print && -x "$GIT_DIR/hooks/pre-release" ]]; then
 	"$GIT_DIR/hooks/pre-release" || exit
 fi
 
@@ -84,12 +84,12 @@ if [[ "$version" == bump || "$version" == print ]]; then
 	fi
 	num="${oldver##*[^[:digit:]]}"
 	prefix="${oldver%$num}"
-	version="$prefix$((num+1))"
 
 	if [[ "$version" == print ]]; then
-		echo "$version"
+		echo "$prefix$((num+1))"
 		exit
 	fi
+	version="$prefix$((num+1))"
 fi
 
 # do the thing
