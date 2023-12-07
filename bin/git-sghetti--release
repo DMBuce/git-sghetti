@@ -20,6 +20,9 @@ the tag with the highest version.
 If <version> is 'bump' (the default), '$prog' determines
 the new version by taking the last line of \`git tag -l '*[[:digit:]]'
 --sort 'v:refname'\` and incrementing the rightmost number.
+
+If <version> is 'print', '$prog' determines and prints a new version,
+then exits.
 --
  Options
 v,new-ver=version  The version to use for the new release.
@@ -75,13 +78,18 @@ fi
 [[ $flavor == ssh ]] && git ssh fetch --tags || exit
 git fetch --tags || exit
 oldver="$(git tag -l '*[[:digit:]]' --sort 'v:refname' | tail -n1)"
-if [[ "$version" == bump ]]; then
+if [[ "$version" == bump || "$version" == print ]]; then
 	if [[ -z "$oldver" ]]; then
 		die "Could not bump version, please specify one with --new-ver"
 	fi
 	num="${oldver##*[^[:digit:]]}"
 	prefix="${oldver%$num}"
 	version="$prefix$((num+1))"
+
+	if [[ "$version" == print ]]; then
+		echo "$version"
+		exit
+	fi
 fi
 
 # do the thing
