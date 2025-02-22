@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# define some vars
+prog="${0##*/}"
+prog="${prog/-sghetti--/ sghetti }"
+SUBDIRECTORY_OK=Yes
+NONGIT_OK=
+OPTIONS_KEEPDASHDASH=
+OPTIONS_STUCKLONG=
+OPTIONS_SPEC="\
+$prog
+
+Fix trailing whitespace in repository.
+--
+"
+
+# normalize options, set up shell functions, define $GIT_DIR, $GIT_OBJECT_DIRECTORY
+. "$(git --exec-path)/git-sh-setup"
+
+# parse options
+while (( $# )); do
+	case "$1" in
+		--)
+			shift
+			break
+		;;
+		-*)
+			die "Unimplemented option (this is a bug): $1"
+		;;
+		*)
+			break
+		;;
+	esac
+	shift
+done
+
+cd_to_toplevel
+while read file; do
+	sed -Ei 's/[[:space:]]+$//' "$file"
+done < <(git diff --check | sed -E '/^[+-]/d; s/:[0-9]+: .*//')
+
