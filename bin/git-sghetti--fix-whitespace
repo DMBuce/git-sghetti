@@ -10,7 +10,7 @@ OPTIONS_STUCKLONG=
 OPTIONS_SPEC="\
 $prog
 
-Fix trailing whitespace in repository.
+Fix trailing whitespace in the working tree.
 --
 "
 
